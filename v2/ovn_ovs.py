@@ -86,11 +86,13 @@ class OVN_OVS_CI(ci.CI):
             openstack.server_add_floating_ip(openstack_vm['name'], fip)
             self._set_vm_fip(openstack_vm, fip)
             self._add_linux_vm(openstack_vm)
+
         for vm in self.opts.windowsVMs:
             openstack_vm = openstack.server_create("%s-%s" % (vmPrefix, vm), self.opts.windowsFlavor, self.opts.windowsImageID, 
                                                    self.opts.internalNet, self.opts.keyName, self.opts.windowsUserData)
             fip = openstack.get_floating_ip(openstack.floating_ip_list()[0])
             openstack.server_add_floating_ip(openstack_vm['name'], fip)
+            openstack.server_add_nic(openstack_vm["name"], self.opts.internalNet)
             self._set_vm_fip(openstack_vm, fip)
             self._add_windows_vm(openstack_vm)
         logging.info("Succesfuly created VMs %s" % [ vm.get("name") for vm in self._get_all_vms()])

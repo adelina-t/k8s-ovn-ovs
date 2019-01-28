@@ -29,6 +29,48 @@ def server_create(name, flavor, imageID, networkID, keyName, userData):
     else:
         raise Exception("Failed to create server: %s with error: %s" % (name, err))
 
+def server_status(server):
+    cmd = ("openstack server show %s -c status -f value" % s)
+    cmd = cmd.split()
+
+    out, err, ret = utils.run_cmd(cmd, stdout=True, stderr=True)
+
+    if ret != 0:
+        raise Exception("Failed to get status for server: %s %s" % (server, err))
+    return out.rstrip("\n")
+
+def wait_for_server_status(server, status):
+    while True:
+        s = server_status(server)
+        if s == status:
+            return
+        time.sleep(10)
+
+def server_add_nic(server, netid):
+    cmd = ("openstack server stop %s" % server)
+    cmd = cmd.split()
+
+    _, err, ret = utils.run_cmd(cmd, stderr=True)
+    if ret != 0:
+        raise Exception("Failed to stop server %s" % server)
+    wait_for_server_status(server, "SHUTOFF")
+
+    cmd = ("nova interface-attach --net-id=%s %s" % (netid, server))
+    cmd = cmd.split()
+
+    _, err, ret = utils.run_cmd(cmd, stderr=True)
+    if ret != 0:
+        raise Exception("Failed to attach nic to server %s, with error: %s" % (server, err))
+    
+    cmd = ("openstack server start %s" % server)
+    cmd = cmd.split()
+
+    _, err, ret = utils.run_cmd(cmd, stderr=True)
+    if ret != 0:
+        raise Exception("Failed to start server %s with error: %s" % (server, err))
+    
+    wait_for_server_status(server, "ACTIVE")
+
 
 def server_delete(server):
     # server = id or name of server
