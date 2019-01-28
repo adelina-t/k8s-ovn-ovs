@@ -39,7 +39,8 @@ class OVN_OVS_CI(ci.CI):
                             "[kube-minions-windows]\nKUBE_MINIONS_WINDOWS_PLACEHOLDER\n")
     ANSIBLE_HOSTS_PATH="%s/contrib/inventory/hosts" % DEFAULT_ANSIBLE_PATH
     DEFAULT_ANSIBLE_WINDOWS_ADMIN="Admin"
-    DEFAULT_ANSIBLE_HOST_VAR_WINDOWS_TEMPLATE="ansible_user: USERNAME_PLACEHOLDER\nansible_password: PASS_PLACEHOLDER\n"
+    DEFAULT_ANSIBLE_HOST_VAR_WINDOWS_TEMPLATE=("ansible_user: USERNAME_PLACEHOLDER\nansible_password: PASS_PLACEHOLDER\n"
+                                               "sdn_preferred_nic_name: \"Ethernet\"\n")
     DEFAULT_ANSIBLE_HOST_VAR_DIR="%s/contrib/inventory/host_vars" % DEFAULT_ANSIBLE_PATH
     HOSTS_FILE="/etc/hosts"
     ANSIBLE_CONFIG_FILE="%s/contrib/ansible.cfg" % DEFAULT_ANSIBLE_PATH

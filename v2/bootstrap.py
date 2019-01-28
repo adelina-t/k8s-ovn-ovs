@@ -179,9 +179,9 @@ def main():
     success = True
     opts = parse_args()[0]
     log_paths = create_log_paths(opts.log_path, opts.gs)
-    logger.info("Log paths: %s" % log_paths)
     # setup logging
     setup_logging(os.path.join(log_paths["build_log"]))
+    logger.info("Log paths: %s" % log_paths)
 
     time.sleep(200) # Give the container a chance to get DNS
     try:
