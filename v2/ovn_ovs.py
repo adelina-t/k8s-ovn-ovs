@@ -92,20 +92,15 @@ class OVN_OVS_CI(ci.CI):
                                                    self.opts.internalNet, self.opts.keyName, self.opts.windowsUserData)
             fip = openstack.get_floating_ip(openstack.floating_ip_list()[0])
             openstack.server_add_floating_ip(openstack_vm['name'], fip)
-            openstack.server_add_nic(openstack_vm["name"], self.opts.internalNet)
+            openstack.server_get_password(openstack_vm['name'], self.opts.keyFile)
+            logging.info("Windows VM: %s succesfully obtained password." % openstack_vm)
+            openstack.server_add_nic(openstack_vm['name'], self.opts.internalNet)
             self._set_vm_fip(openstack_vm, fip)
             self._add_windows_vm(openstack_vm)
         logging.info("Succesfuly created VMs %s" % [ vm.get("name") for vm in self._get_all_vms()])
 
-    def _wait_for_windows_machines(self):
-        logging.info("Waiting for Windows VMs to obtain Admin password.")
-        for vm in self._get_windows_vms():
-            openstack.server_get_password(vm['name'], self.opts.keyFile)
-            logging.info("Windows VM: %s succesfully obtained password." % vm.get("name"))
-
     def _prepare_env(self):
         self._create_vms()
-        self._wait_for_windows_machines()
 
     def _destroy_cluster(self):
         vmPrefix = self.opts.cluster_name
