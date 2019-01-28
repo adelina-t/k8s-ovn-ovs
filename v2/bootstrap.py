@@ -179,7 +179,7 @@ def main():
     success = True
     opts = parse_args()[0]
     log_paths = create_log_paths(opts.log_path, opts.gs)
-    
+    logger.info("Log paths: %s" % log_paths)
     # setup logging
     setup_logging(os.path.join(log_paths["build_log"]))
 
@@ -206,7 +206,7 @@ def main():
         success = False
     finally:
         create_finished(log_paths["finished"], success)
-        upload_artifacts(opts.log_path, opts.gs)
+        upload_artifacts(opts.log_path, log_paths["remote_job_path"])
     
 if __name__ == "__main__":
     main()
