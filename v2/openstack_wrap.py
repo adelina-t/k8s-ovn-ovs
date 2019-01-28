@@ -30,7 +30,7 @@ def server_create(name, flavor, imageID, networkID, keyName, userData):
         raise Exception("Failed to create server: %s with error: %s" % (name, err))
 
 def server_status(server):
-    cmd = ("openstack server show %s -c status -f value" % s)
+    cmd = ("openstack server show %s -c status -f value" % server)
     cmd = cmd.split()
 
     out, err, ret = utils.run_cmd(cmd, stdout=True, stderr=True)
@@ -41,6 +41,7 @@ def server_status(server):
 
 def wait_for_server_status(server, status):
     while True:
+        logging.info("Waiting for server %s to reach status: %s" %(server, status))
         s = server_status(server)
         if s == status:
             return

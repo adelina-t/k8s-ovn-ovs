@@ -62,6 +62,7 @@ def parse_args():
     p.add('--job-branch', default="master", help='Branch for job runner.')
     p.add('--service-account', help='Service account for gcloud login.')
     p.add('--log-path', default="/tmp/civ2_logs")
+    p.add('--gs', help='Log bucket')
     p.add('job_args', nargs=configargparse.REMAINDER)
 
     opts = p.parse_known_args()
@@ -132,17 +133,20 @@ def download_file(url, dst):
     if ret != 0:
         logger.error("Failed to download file: %s" % url)
 
-def create_log_paths(log_path):
+def create_log_paths(log_path, remote_base):
     # TO DO:Since we upload to gcloud we should make sure the user specifies an empty path
     
     mkdir_p(log_path)
     artifacts_path = os.path.join(log_path, "artifacts")
     mkdir_p(artifacts_path)
+    job_name = os.environ.get("JOB_NAME", "defaultjob")
+    build_id = os.environ.get("BUILD_ID", "0000-0000-0000-0000")
     paths = {
         "build_log": os.path.join(log_path, "build-log.txt"),
         "artifacts": artifacts_path,
         "finished": os.path.join(log_path, "finished.json"),
         "started": os.path.join(log_path, "started.json"),
+        "remote_job_path": os.path.join(remote_base, job_name, build_id)
     }
     return paths
 
@@ -164,12 +168,17 @@ def create_finished(path, success=True, meta=None):
     with open(path) as f:
         json.dumps(data, f)
 
+def upload_artifacts(local, remote):
+    cmd = "gsutil -q cp -r %s/* %s" % (local, remote)
+    cmd = cmd.split()
+    call(cmd)
+
 
 def main():
 
     success = True
     opts = parse_args()[0]
-    log_paths = create_log_paths(opts.log_path)
+    log_paths = create_log_paths(opts.log_path, opts.gs)
     
     # setup logging
     setup_logging(os.path.join(log_paths["build_log"]))
@@ -197,7 +206,7 @@ def main():
         success = False
     finally:
         create_finished(log_paths["finished"], success)
-#        upload_artifacts(log)
+        upload_artifacts(log)
     
 if __name__ == "__main__":
     main()
