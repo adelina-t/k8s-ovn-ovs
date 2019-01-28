@@ -155,8 +155,8 @@ def create_started(path):
         'timestamp': int(time.time()),
         'node': "temp",
     }
-    with open(path) as f:
-        json.dumps(data, f)
+    with open(path, "w") as f:
+        json.dump(data, f)
 
 def create_finished(path, success=True, meta=None):
     data = {
@@ -165,8 +165,8 @@ def create_finished(path, success=True, meta=None):
         'passed': bool(success),
         'metadata': meta,
     }
-    with open(path) as f:
-        json.dumps(data, f)
+    with open(path, "w") as f:
+        json.dump(data, f)
 
 def upload_artifacts(local, remote):
     cmd = "gsutil -q cp -r %s/* %s" % (local, remote)
@@ -206,7 +206,7 @@ def main():
         success = False
     finally:
         create_finished(log_paths["finished"], success)
-        upload_artifacts(log)
+        upload_artifacts(opts.log_path, opts.gs)
     
 if __name__ == "__main__":
     main()
