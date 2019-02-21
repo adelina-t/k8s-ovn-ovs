@@ -152,9 +152,11 @@ class OVN_OVS_CI(ci.CI):
         with open(OVN_OVS_CI.ANSIBLE_CONFIG_FILE, "a") as f:
             log_file = os.path.join(self.opts.log_path, "ansible-deploy.log")
             log_config = "log_path=%s\n" % log_file
+            profiling_config = "\ncallback_whitelist = profile_tasks\n"
             # This probably goes better in /etc/ansible.cfg (set in dockerfile )
             ansible_config="\n\n[ssh_connection]\nssh_args=-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null\n"
-            f.write(log_config) 
+            f.write(log_config)
+            f.write(profiling_config)
             f.write(ansible_config)
 
         full_ansible_tmp_path = os.path.join(OVN_OVS_CI.ANSIBLE_CONTRIB_PATH, "tmp")
@@ -169,6 +171,10 @@ class OVN_OVS_CI(ci.CI):
             full_file_path = os.path.join(utils.get_k8s_folder(), constants.KUBERNETES_WINDOWS_BINS_LOCATION, file)
             logging.info("Copying %s to %s." % (full_file_path, full_ansible_tmp_path))
             shutil.copy(full_file_path, full_ansible_tmp_path)
+
+        # Set environment for profiling
+        os.environ["PROFILE_TASKS_SORT_ORDER"]="none"
+        os.environ["PROFILE_TASKS_TASK_OUTPUT_LIMIT"]="all"
 
     def _deploy_ansible(self):
         logging.info("Starting Ansible deployment.")
