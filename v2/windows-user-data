@@ -17,3 +17,5 @@ Set-Service -Name sshd -StartupType 'Automatic'
 # Set powershell as default shell for ssh
 
 New-ItemProperty -Path "HKLM:\SOFTWARE\OpenSSH" -Name DefaultShell -Value "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -PropertyType String -Force
+New-ItemProperty HKLM:\SYSTEM\CurrentControlSet\Services\hns\State -Name VolatileNetworks -PropertyType DWORD -Value 1
+Restart-service hns
