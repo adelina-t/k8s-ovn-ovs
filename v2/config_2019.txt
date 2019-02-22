@@ -4,7 +4,7 @@ linuxUserData = ./linux-user-data
 linuxFlavor = 6
 linuxImageID = xenial-20180831
 
-windowsVMs = [win1, win2]
+windowsVMs = [w1, w2]
 windowsUserData = ./windows-user-data
 windowsFlavor = 6
 windowsImageID = windows-2019-hyper-v-20.02.18
