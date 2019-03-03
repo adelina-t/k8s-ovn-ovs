@@ -190,6 +190,7 @@ class OVN_OVS_CI(ci.CI):
 
         if ret != 0:
             logging.error("Failed to deploy ansible-playbook with error: %s" % out)
+            time.sleep(100000000)
             raise Exception("Failed to deploy ansible-playbook with error: %s" % out)
         logging.info("Succesfully deployed ansible-playbook.")
 
