@@ -30,5 +30,3 @@ class Flannel_CI(ovn_ovs.OVN_OVS_CI):
         self.ansible_host_var_dir = Flannel_CI.DEFAULT_ANSIBLE_HOST_VAR_DIR
         self.ansible_config_file = Flannel_CI.ANSIBLE_CONFIG_FILE
 
-    def _deploy_ansible(self):
-        time.sleep(100000000000)

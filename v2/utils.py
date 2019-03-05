@@ -79,6 +79,13 @@ def get_k8s(repo, branch):
     logging.info("Get Kubernetes.")
     k8s_path = get_k8s_folder()
     clone_repo(repo, branch, k8s_path)
+    # Custom cherry-picks
+    cmd = "wget https://github.com/kubernetes/kubernetes/pull/74933.diff && git apply 74933.diff"
+    cmd = cmd.split()
+    _, err, ret = run_cmd(cmd, stderr=True, cwd=k8s_path, shell=True)
+    if ret != 0:
+        logging.error("Failed to get cherrypick %s" % err)
+        raise Exception("Failed to get cherrypick %s" % err)
 
 def download_file(url, dst):
     cmd = ["wget", url, "-O", dst]

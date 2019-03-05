@@ -3,6 +3,7 @@ import configargparse
 import ci_factory
 import logging
 import utils
+import time
 
 p = configargparse.get_argument_parser()
 logging.basicConfig(level=logging.DEBUG, format='%(levelname)s %(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
@@ -52,6 +53,7 @@ def main():
             ci.up()
         if opts.test == True:
             success = ci.test()
+        time.sleep(1000000)
         if opts.down == True:
             ci.down()
         return success
