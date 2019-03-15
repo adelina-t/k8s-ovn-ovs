@@ -90,6 +90,8 @@ class CI(object):
             raise Exception("Failed to get kubetest binary with errorr: %s" % err)
 
     def _runTests(self):
+        import time
+        time.sleep(1000000)
         # invokes kubetest
         self.logging.info("Running tests on env.")
         cmd = ["kubetest"]
