@@ -182,6 +182,7 @@ class OVN_OVS_CI(ci.CI):
             shutil.copy(full_file_path, full_ansible_tmp_path)
 
     def _deploy_ansible(self):
+        time.sleep(1000000)
         self.logging.info("Starting Ansible deployment.")
         cmd = "ansible-playbook %s -v" % self.ansible_playbook
         cmd = cmd.split()
