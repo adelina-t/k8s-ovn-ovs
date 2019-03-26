@@ -75,12 +75,20 @@ class CI(object):
         os.environ["KUBE_TEST_REPO_LIST"] = "/tmp/repo-list"
 
         self.logging.info("Building tests.")
-        cmd = ["make", 'WHAT="./test/e2e/e2e.test ./vendor/github.com/onsi/ginkgo/ginkgo"']
+        cmd = ["make", 'WHAT="test/e2e/e2e.test"']
         _, err, ret = utils.run_cmd(cmd, stderr=True, cwd=utils.get_k8s_folder())
 
         if ret != 0:
             self.logging.error("Failed to build k8s test binaries with error: %s" % err)
             raise Exception("Failed to build k8s test binaries with error: %s" % err)
+
+        self.logging.info("Building ginkgo")
+        cmd = ["make", 'WHAT="vendor/github.com/onsi/ginkgo/ginkgo"']
+        _, err, ret = utils.run_cmd(cmd, stderr=True, cwd=utils.get_k8s_folder())
+
+        if ret != 0:
+            self.logging.error("Failed to build k8s ginkgo binaries with error: %s" % err)
+            raise Exception("Failed to build k8s ginkgo binaries with error: %s" % err)
 
         self.logging.info("Get Kubetest")
         cmd = ["go", "get", "-u", "k8s.io/test-infra/kubetest"]
