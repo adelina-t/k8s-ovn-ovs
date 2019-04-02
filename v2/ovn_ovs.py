@@ -325,7 +325,7 @@ class OVN_OVS_CI(ci.CI):
                     openstack.reboot_server(vm["name"])
             self._prepullImages()
         except:
-            time.sleep(1000000)
+            raise e
 
     def up(self):
         self.logging.info("Bringing cluster up.")
