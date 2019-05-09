@@ -1,7 +1,8 @@
-FROM ubuntu:xenial
+FROM ubuntu:bionic
 
 RUN apt-get update &&  apt-get install -y software-properties-common python python-pip \
-    git make curl build-essential libssl-dev libffi-dev python-dev python-openssl wget unzip
+    git make curl build-essential libssl-dev libffi-dev python-dev python-openssl wget unzip \
+    rsync
 
 RUN pip install --upgrade setuptools && \
     pip install python-openstackclient && \
