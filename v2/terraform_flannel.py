@@ -306,7 +306,7 @@ class Terraform_Flannel(ci.CI):
         os.environ["KUBE_MASTER_URL"] = "https://kubernetes"
         os.environ["KUBECONFIG"] = "/tmp/kubeconfig"
 
-        self._prepullImages(self.opts.containerRuntime)
+        #self._prepullImages(self.opts.containerRuntime)
 
     def build(self):
         self.logging.info("Building k8s binaries.")
