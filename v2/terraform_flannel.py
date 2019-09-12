@@ -357,6 +357,8 @@ class Terraform_Flannel(ci.CI):
         try:
             self.deployer.up()
             self._prepare_ansible()
+            import time
+            time.sleep(1000000000)
             self._deploy_ansible()
         except Exception as e:
             raise e
