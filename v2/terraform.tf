@@ -244,7 +244,7 @@ resource "azurerm_virtual_machine" "winMinionVM" {
 
   storage_image_reference {
     publisher = "MicrosoftWindowsServer"
-    offer     = "WindowsServer"
+    offer     = "WindowsServerSemiAnnual"
     sku       = "Datacenter-Core-1809-with-Containers-smalldisk"
     version   = "1809.0.20190711"
   }
