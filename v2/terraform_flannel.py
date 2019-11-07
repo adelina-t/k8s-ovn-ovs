@@ -369,6 +369,8 @@ class Terraform_Flannel(ci.CI):
             self.deployer.up()
             self._prepare_ansible()
             self._add_ssh_key()
+            import time
+            time.sleep(10000000)
             self._deploy_ansible()
         except Exception as e:
             raise e
