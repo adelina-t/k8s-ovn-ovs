@@ -167,12 +167,6 @@ class Terraform_Flannel(ci.CI):
             f.write("AZURE_CCM: %s\n" % azure_ccm)
             f.write("AZURE_CCM_LOCAL_PATH: %s\n" % Terraform_Flannel.AZURE_CCM_LOCAL_PATH)
 
-    def _add_ssh_key(self):
-        self.logging.info("Adding SSH key.")
-        vms = self.deployer.get_cluster_win_minion_vms_names()
-        self._runRemoteCmd(("mkdir C:\\\\Users\\\\%s\\\\.ssh" % constants.WINDOWS_ADMIN_USER), vms, self.opts.remoteCmdRetries, windows=True)
-        self._copyTo(self.opts.ssh_public_key_path, ("C:\\\\Users\\\\%s\\\\.ssh\\\\authorized_keys" % constants.WINDOWS_ADMIN_USER), vms, windows=True)
-
     def _install_patches(self):
         self.logging.info("Installing patches.")
         installer_script = os.path.join("/tmp/k8s-ovn-ovs/v2/installPatches.ps1")
@@ -395,7 +389,6 @@ class Terraform_Flannel(ci.CI):
         try:
             self.deployer.up()
             self._prepare_ansible()
-            self._add_ssh_key()
             if self.patches is not None:
                 self._install_patches()
             self._deploy_ansible()

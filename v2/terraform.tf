@@ -224,8 +224,8 @@ resource "azurerm_virtual_machine_extension" "powershell_winservices" {
 
   settings = <<SETTINGS
     {
-        "fileUris": ["https://raw.githubusercontent.com/e2e-win/k8s-ovn-ovs/master/v2/enableWinServices.ps1"],
-        "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File enableWinServices.ps1 *> C:\\enableWinServices.log"
+        "fileUris": ["https://raw.githubusercontent.com/adelina-t/k8s-ovn-ovs/terraform_kubeadm/v2/enableWinServices.ps1"],
+        "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File enableWinServices.ps1 -sshKeyData \"${var.ssh_key_data}\" -sshUser \"${var.win_minion_vm_username}\" *> C:\\enableWinServices.log"
     }
 SETTINGS
 }

@@ -27,7 +27,20 @@ class Terraform_Kubeadm(ci.CI):
         self.opts = p.parse_known_args()[0]
         self.logging = log.getLogger(__name__)
         self.default_linux_username = "ubuntu" # Oversight in terraform. This should be configurable
+<<<<<<< HEAD
     
+=======
+
+
+    def up(self):
+        self.logging.info("Bringing cluster up.")
+        try:
+            self.deployer.up()
+            import time
+            time.sleep(1000000000)
+        except Exception as e:
+            raise e
+>>>>>>> e549a1a... Create user profile and copy ssh public key directly in enableWinServices.
 
     # These functions are implemented like so to preserve the interface defined by collectlogs functions
     # Those functions should be moved to base CI class and they should be used by all children.
