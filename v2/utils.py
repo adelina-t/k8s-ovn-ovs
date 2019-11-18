@@ -8,8 +8,8 @@ import shutil
 import string
 import glob
 import constants
-from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKCS1_v1_5
+#from Crypto.PublicKey import RSA
+#from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKCS1_v1_5
 from base64 import b64encode
 
 logging = log.getLogger(__name__)
@@ -25,6 +25,7 @@ def run_cmd(cmd, timeout=50000, env=None, stdout=False,
     def kill_proc_timout(proc):
         proc.kill()
         raise CmdTimeoutExceededException("Timeout of %s exceeded for cmd %s" % (timeout, cmd))
+    print cmd
 
     FNULL = open(os.devnull, "w")
     f_stderr = FNULL
@@ -255,6 +256,31 @@ def download_file(url, dst):
     if ret != 0:
         logging.error("Failed to download file: %s" % url)
 
+def run_ssh_cmd(cmd, user, host, key_file):
+    ssh_cmd = ["ssh","-o","StrictHostKeyChecking=no","-o","UserKnownHostsFile=/dev/null", "-i", key_file, "%s@%s" % (user, host)]
+    ssh_cmd = ssh_cmd + cmd
 
-def run_ssh_cmd(cmd, user, host,):
-    cmd = ["ssh", "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"]
+    out, err, ret = run_cmd(ssh_cmd, stdout=True, stderr=True, shell=True)
+    if ret != 0:
+        logging.error("Failed to run ssh cmd %s with error %s" % (ssh_cmd, err))
+        raise Exception("Failed to run ssh cmd %s with error %s" % (ssh_cmd, err))
+    return out
+
+def scp_put(src, dst, user, host, key_file):
+    scp_cmd = ["scp", "-o","StrictHostKeyChecking=no","-o","UserKnownHostsFile=/dev/null", "-i", key_file, src, "%s@%s:%s" % (user, host, dst)]
+
+    out, err, ret = run_cmd(scp_cmd, stdout=True, stderr=True, shell=True)
+    if ret != 0:
+        logging.error("Failed to run scp put cmd %s with error %s" % (scp_cmd, err))
+        raise Exception("Failed to run scp put cmd %s with error %s" % (scp_cmd, err))
+    return out
+
+
+def scp_get(src, dst, user, host, key_file):
+    scp_cmd = ["scp", "-o","StrictHostKeyChecking=no","-o","UserKnownHostsFile=/dev/null", "-i", key_file, "%s@%s:%s" % (user, host, src), dst]
+
+    out, err, ret = run_cmd(scp_cmd, stdout=True, stderr=True, shell=True)
+    if ret != 0:
+        logging.error("Failed to run scp get cmd %s with error %s" % (scp_cmd, err))
+        raise Exception("Failed to run scp get cmd %s with error %s" % (scp_cmd, err))
+    return out
