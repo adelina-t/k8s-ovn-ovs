@@ -26,6 +26,8 @@ p.add("--win-minion-image", default="MicrosoftWindowsServer:WindowsServerSemiAnn
 p.add("--terraform-config")
 p.add("--ssh-public-key-path", default=os.path.join(os.path.join(os.getenv("HOME"), ".ssh", "id_rsa.pub")))
 p.add("--ssh-private-key-path", default=os.path.join(os.path.join(os.getenv("HOME"), ".ssh", "id_rsa")))
+p.add("--master-install-docker", default=False)
+p.add("--master-docker-version", default="5:19.03.5~3-0~ubuntu-xenial", help="Docker version to install on master")
 
 
 class TerraformProvisioner(deployer.NoopDeployer):
@@ -207,6 +209,8 @@ class TerraformProvisioner(deployer.NoopDeployer):
             f.write(out_format % ("win_minion_vm_username", self.get_win_vm_username()))
             f.write(out_format % ("win_minion_vm_password", self.get_win_vm_password()))
             f.write(out_format % ("ssh_key_data", ssh_public_key))
+            f.write(out_format % ("master_install_docker", self.opts.master_install_docker))
+            f.write(out_format % ("master_docker_version", self.opts.master_docker_version))
             f.write(extra_args)
 
     def _get_terraform_vars_azure(self):

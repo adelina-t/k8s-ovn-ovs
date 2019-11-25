@@ -2,6 +2,8 @@ variable rg_name {}
 variable location {}
 variable master_vm_name {}
 variable master_vm_size {}
+variable master_install_docker {}
+variable master_docker_version {}
 variable win_minion_count {}
 variable win_minion_vm_size {}
 variable win_minion_vm_name_prefix {}
@@ -114,6 +116,26 @@ resource "azurerm_network_interface" "masterNic" {
   }
 }
 
+# Install Docker on master
+resource "azurerm_virtual_machine_extension" "installDocker" {
+  count                = "${var.master_install_docker == "True" ? 1 : 0}"
+  name                 = "installDocker"
+  location             = "${var.location}"
+  resource_group_name  = "${azurerm_resource_group.clusterRg.name}"
+  virtual_machine_name = "${azurerm_virtual_machine.masterVM.name}"
+  publisher            = "Microsoft.Azure.Extensions"
+  type                 = "CustomScript"
+  type_handler_version = "2.0"
+
+  # TODO: Point to prod repo before PR
+  settings = <<SETTINGS
+    {
+        "fileUris": ["https://raw.githubusercontent.com/CristianHenzel/k8s-ovn-ovs/kubeadm/v2/setup-docker.sh"],
+        "commandToExecute": "bash setup-docker.sh ${var.master_docker_version}"
+    }
+SETTINGS
+}
+
 # Create virtual machine
 resource "azurerm_virtual_machine" "masterVM" {
   name                  = "${var.master_vm_name}"
@@ -224,8 +246,8 @@ resource "azurerm_virtual_machine_extension" "powershell_winservices" {
 
   settings = <<SETTINGS
     {
-        "fileUris": ["https://raw.githubusercontent.com/adelina-t/k8s-ovn-ovs/terraform_kubeadm/v2/enableWinServices.ps1"],
-        "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File enableWinServices.ps1 -sshKeyData \"${var.ssh_key_data}\" -sshUser \"${var.win_minion_vm_username}\" *> C:\\enableWinServices.log"
+        "fileUris": ["https://raw.githubusercontent.com/e2e-win/k8s-ovn-ovs/master/v2/enableWinServices.ps1"],
+        "commandToExecute": "powershell -ExecutionPolicy Unrestricted -File enableWinServices.ps1 *> C:\\enableWinServices.log"
     }
 SETTINGS
 }
