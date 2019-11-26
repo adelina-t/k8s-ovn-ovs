@@ -64,9 +64,6 @@ def main():
             logging.error("Building containerdshim from vendoring repo without building containerd is not supported")
             sys.exit(1)
 
-        if opts.build is not None:
-            ci.build(opts.build)
-
         if opts.install_patch is not None:
             ci.set_patches(" ".join(opts.install_patch))
 
@@ -74,6 +71,10 @@ def main():
             if opts.down is True:
                 ci.down()
             ci.up()
+
+            if opts.build is not None:
+                ci.build(opts.build)
+
         if opts.test is True:
             success = ci.test()
         if success != 0:
