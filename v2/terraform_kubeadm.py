@@ -63,19 +63,23 @@ class Terraform_Kubeadm(ci.CI):
         def _build_k8s_linux_binaries():
             #Binaries built here are to be installed dirrectly on the master, and are not built by the _build_k8s_release_images function
             for binary in k8s_linux_bins:
-                cmd = "cd kubernetes ; build/run.sh make %s KUBE_BUILD_PLATFORMS=linux/amd64" % binary
+                self.logging.info("Building %s for linux/amd64" % binary)
+                cmd = "cd kubernetes ; build/run.sh make %s KUBE_BUILD_PLATFORMS=linux/amd64 KUBE_VERBOSE=0" % binary
                 self._runRemoteCmd(cmd, [build_host])
 
         def _build_k8s_windows_binaries():
-            for binary in k8s_linux_bins:
-                cmd = "cd kubernetes ; build/run.sh make %s KUBE_BUILD_PLATFORMS=windows/amd64" % binary
+            for binary in k8s_windows_bins:
+                self.logging.info("Building %s for windows/amd64" % binary)
+                cmd = "cd kubernetes ; build/run.sh make %s KUBE_BUILD_PLATFORMS=windows/amd64 KUBE_VERBOSE=0" % binary
                 self._runRemoteCmd(cmd, [build_host])
 
         def _package_k8s_windows_binaries():
-            cmd = "cd kubernetes ; mkdir _output/release-tars ; KUBE_BUILD_PLATFORMS=windows/amd64 && TAR=\`which tar\` && source build/common.sh && source build/lib/release.sh && kube::release::package_src_tarball && kube::release::package_node_tarballs "
+            self.logging.info("Packaging windows binaries.")
+            cmd = "cd kubernetes ; mkdir _output/release-tars ; KUBE_BUILD_PLATFORMS=windows/amd64 && TAR=/bin/tar && source build/common.sh && source build/lib/release.sh && kube::release::package_src_tarball && kube::release::package_node_tarballs "
             self._runRemoteCmd(cmd, [build_host])
 
         def _build_k8s_release_images():
+            self.logging.info("Building linux release images.")
             cmd = "cd kubernetes ; export KUBE_VERBOSE=0 ; export KUBE_BUILD_CONFORMANCE=n ; export KUBE_BUILD_PLATFORMS=linux/amd64; export KUBE_BUILD_HYPERKUBE=n ;  make quick-release-images"
             self._runRemoteCmd(cmd, [build_host])
         
@@ -98,7 +102,7 @@ class Terraform_Kubeadm(ci.CI):
         else:
             username = self.default_linux_username
         for machine in machines:
-            out = utils.run_ssh_cmd(["\"%s\"" % command], username, machine, self.opts.ssh_private_key_path)
+            out = utils.run_ssh_cmd(command, username, machine, self.opts.ssh_private_key_path)
 
     def _copyTo(self, src, dest, machines, windows=False, root=False):
         if windows:

@@ -8,6 +8,7 @@ import shutil
 import string
 import glob
 import constants
+import paramiko
 #from Crypto.PublicKey import RSA
 #from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKCS1_v1_5
 from base64 import b64encode
@@ -259,15 +260,24 @@ def download_file(url, dst):
     if ret != 0:
         logging.error("Failed to download file: %s" % url)
 
-def run_ssh_cmd(cmd, user, host, key_file):
-    ssh_cmd = ["ssh","-o","StrictHostKeyChecking=no","-o","UserKnownHostsFile=/dev/null", "-i", key_file, "%s@%s" % (user, host)]
-    ssh_cmd = ssh_cmd + cmd
+def _get_ssh_client(user, host, key):
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(
+        paramiko.AutoAddPolicy())
+    ssh.connect(host, username=user, key_filename=key)
+    return ssh
 
-    out, err, ret = run_cmd(ssh_cmd, stdout=True, stderr=True, shell=True)
-    if ret != 0:
-        logging.error("Failed to run ssh cmd %s with error %s" % (ssh_cmd, err))
-        raise Exception("Failed to run ssh cmd %s with error %s" % (ssh_cmd, err))
-    return out
+def run_ssh_cmd(cmd, user, host, key_file):
+    ssh_client = _get_ssh_client(user, host, key_file)
+    stdin, stdout, stderr = ssh_client.exec_command(cmd)
+    std_out = stdout.read().decode()
+    std_err = stderr.read().decode()
+    logging.info(std_out)
+    exit_code = stdout.channel.recv_exit_status()
+    if exit_code != 0:
+        logging.error("Failed to run ssh cmd %s with error %s" % (cmd, std_err))
+        raise Exception("Failed to run ssh cmd %s with error %s" % (cmd, std_err))
+    return std_out
 
 def scp_put(src, dst, user, host, key_file):
     scp_cmd = ["scp", "-o","StrictHostKeyChecking=no","-o","UserKnownHostsFile=/dev/null", "-i", key_file, src, "%s@%s:%s" % (user, host, dst)]

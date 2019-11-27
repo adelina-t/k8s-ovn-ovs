@@ -6,7 +6,8 @@ RUN apt-get update &&  apt-get install -y software-properties-common python pyth
 RUN pip install --upgrade setuptools && \
     pip install python-openstackclient && \
     pip install python-novaclient && \
-    pip install crudini
+    pip install crudini && \
+    pip install paramiko
 
 # Install Ansible
 RUN apt-add-repository ppa:ansible/ansible -y && apt-get update && apt-get install ansible -y
@@ -14,11 +15,11 @@ RUN pip install pywinrm
 
 # Install Golang
 
-RUN curl -O https://dl.google.com/go/go1.12.4.linux-amd64.tar.gz
-RUN tar -xvf go1.12.4.linux-amd64.tar.gz
+RUN curl -O https://dl.google.com/go/go1.13.4.linux-amd64.tar.gz
+RUN tar -xvf go1.13.4.linux-amd64.tar.gz
 RUN mv go /usr/local
 RUN rm -rf go
-RUN rm go1.12.4.linux-amd64.tar.gz
+RUN rm go1.13.4.linux-amd64.tar.gz
 ENV GOPATH "/go"
 ENV PATH "$PATH:/usr/local/go/bin:$GOPATH/bin"
 RUN mkdir -p /go/src
