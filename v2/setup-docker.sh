@@ -13,4 +13,7 @@ sudo add-apt-repository "deb [arch=amd64] ${DOCKER_APT_REPO} $(lsb_release -cs) 
 sudo apt update
 sudo apt install -y docker-ce="${DOCKER_VERSION}" docker-ce-cli="${DOCKER_VERSION}" containerd.io
 
+# Use docker without sudo
+sudo usermod -aG docker ubuntu
+
 exit 0

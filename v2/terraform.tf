@@ -130,7 +130,7 @@ resource "azurerm_virtual_machine_extension" "installDocker" {
   # TODO: Point to prod repo before PR
   settings = <<SETTINGS
     {
-        "fileUris": ["https://raw.githubusercontent.com/CristianHenzel/k8s-ovn-ovs/kubeadm/v2/setup-docker.sh"],
+        "fileUris": ["https://raw.githubusercontent.com/adelina-t/k8s-ovn-ovs/terraform_kubeadm/v2/setup-docker.sh"],
         "commandToExecute": "bash setup-docker.sh ${var.master_docker_version}"
     }
 SETTINGS
