@@ -4,6 +4,9 @@ WINDOWS_ADMIN_USER = "azureuser"
 KUBERNETES_LINUX_BINS_LOCATION = "_output/local/bin/linux/amd64/"
 KUBERNETES_WINDOWS_BINS_LOCATION = "_output/local/bin/windows/amd64"
 
+KUBERNETES_WINDOWS_RELEASE_TARBALLS = "kubernetes-node-windows-amd64.tar.gz"
+KUBERNETES_TARBALL_LOCATION = "_output/release-tars"
+
 SDN_BINS_LOCATION = "out"
 CONTAINERD_BINS_LOCATION = "_output"
 CONTAINERD_SHIM_DIR = "./cmd/containerd-shim-runhcs-v1"

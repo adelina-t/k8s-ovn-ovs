@@ -7,6 +7,7 @@ import subprocess
 import stat
 import ci
 import terraform
+import constants
 
 TESTINFRA_REPO_URL = "https://github.com/kubernetes/test-infra"
 
@@ -74,21 +75,40 @@ class Terraform_Kubeadm(ci.CI):
                 self._runRemoteCmd(cmd, [build_host])
 
         def _package_k8s_windows_binaries():
-            self.logging.info("Packaging windows binaries.")
-            cmd = "cd kubernetes ; mkdir _output/release-tars ; KUBE_BUILD_PLATFORMS=windows/amd64 && TAR=/bin/tar && source build/common.sh && source build/lib/release.sh && kube::release::package_src_tarball && kube::release::package_node_tarballs "
+            # self.logging.info("Packaging windows binaries.")
+            # cmd = "cd kubernetes ; mkdir _output/release-tars ; KUBE_BUILD_PLATFORMS=windows/amd64 && TAR=/bin/tar && source build/common.sh && source build/lib/release.sh && kube::release::package_src_tarball && kube::release::package_node_tarballs "
+            # self._runRemoteCmd(cmd, [build_host])
+            
+            remote_path = os.path.join('/home/ubuntu/kubernetes', constants.KUBERNETES_TARBALL_LOCATION, constants.KUBERNETES_WINDOWS_RELEASE_TARBALLS)
+            cmd = "mkdir -p %s" % ( os.path.join('/home/ubuntu/kubernetes', constants.KUBERNETES_TARBALL_LOCATION))
+            self._runRemoteCmd(cmd, [build_host])
+            cmd = "echo 'whatever random' > %s" % remote_path
             self._runRemoteCmd(cmd, [build_host])
 
         def _build_k8s_release_images():
             self.logging.info("Building linux release images.")
             cmd = "cd kubernetes ; export KUBE_VERBOSE=0 ; export KUBE_BUILD_CONFORMANCE=n ; export KUBE_BUILD_PLATFORMS=linux/amd64; export KUBE_BUILD_HYPERKUBE=n ;  make quick-release-images"
             self._runRemoteCmd(cmd, [build_host])
-        
+
         self._clone_k8s_repo(build_host, remote_k8s_path)
-        _install_prereqs()
-        _build_k8s_linux_binaries()
-        _build_k8s_release_images()
-        _build_k8s_windows_binaries()
+        # _install_prereqs()
+        # _build_k8s_linux_binaries()
+        # _build_k8s_release_images()
+        # _build_k8s_windows_binaries()
         _package_k8s_windows_binaries()
+        self._prepare_for_kubeadm_deploy()
+
+    def _prepare_for_kubeadm_deploy(self):
+        self._stage_k8s_windows_release()
+
+    def _stage_k8s_windows_release(self):
+        tarball_remote_src = os.path.join('/home/ubuntu/kubernetes', constants.KUBERNETES_TARBALL_LOCATION, constants.KUBERNETES_WINDOWS_RELEASE_TARBALLS)
+        tarball_local_dst = os.path.join('/tmp/', constants.KUBERNETES_WINDOWS_RELEASE_TARBALLS)
+        self._copyFrom(tarball_remote_src, tarball_local_dst, self.deployer.get_cluster_master_public_ip())
+
+        blob_name = constants.KUBERNETES_WINDOWS_RELEASE_TARBALLS
+        utils.upload_blob(blob_name, tarball_local_dst)
+
 
     def _clone_k8s_repo(self, remote_host, remote_path):
         cmd = utils.get_clone_command(self.opts.k8s_repo, self.opts.k8s_branch, remote_path)

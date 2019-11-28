@@ -12,6 +12,7 @@ import paramiko
 #from Crypto.PublicKey import RSA
 #from Crypto.Cipher import PKCS1_v1_5 as Cipher_PKCS1_v1_5
 from base64 import b64encode
+from azure.storage.blob import BlockBlobService
 
 logging = log.getLogger(__name__)
 
@@ -297,3 +298,18 @@ def scp_get(src, dst, user, host, key_file):
         logging.error("Failed to run scp get cmd %s with error %s" % (scp_cmd, err))
         raise Exception("Failed to run scp get cmd %s with error %s" % (scp_cmd, err))
     return out
+
+def upload_blob(blob_name, blob_file):
+    try:
+        container_name = os.environ['AZURE_STORAGE_CONTAINER'].strip()
+        storage_account = os.environ['AZURE_STORAGE_ACCOUNT'].strip()
+        storage_key = os.environ['AZURE_STORAGE_ACCOUNT_KEY'].strip()
+
+        blob_client = BlockBlobService(account_name=storage_account, account_key=storage_key)
+        content = blob_client.list_blobs(container_name)
+
+        
+        blob_client.create_blob_from_path(container_name, blob_name, blob_file)
+    except Exception as e:
+         logging.error("Failed to upload release with error: %s", e)
+         raise Exception("Failed to upload release with error: %s" % e)
